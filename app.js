@@ -1,8 +1,10 @@
-import express from 'express'
-import { db } from './db/dbConnection.js'
-const app = express()
-const port = 6060
-
-db
-app.get('/', (req, res) => res.send('Hello World!'))
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+import express from "express";
+import { db } from "./db/dbConnection.js";
+import newsRouter from "./src/modules/news/news.routes.js";
+const app = express();
+const port = 6060;
+app.use(express.json());
+db;
+app.use("/news", newsRouter);
+app.get("/", (req, res) => res.send("Hello World!"));
+app.listen(port, () => console.log(`Example app listening on port ${port}!`));
