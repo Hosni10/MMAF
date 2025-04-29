@@ -1,5 +1,5 @@
 import { newsModel } from "../../../db/models/news.model.js";
-import imagekit, { destroyImage } from "../../../utilities/imagekitConfigration.js";
+import imagekit, { destroyImage } from "../../utilities/imagekitConfigration.js";
 import { nanoid } from "nanoid";
 
 export const addNews = async (req, res, next) => {

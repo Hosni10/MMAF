@@ -1,7 +1,7 @@
 import express from "express";
 import { addNews, deleteNews, getNews, getNewsById, updateNews } from "./news.controller.js";
 import { multerCloudFunction } from "../../../services/multerCloud.js";
-import { allowedExtensions } from "../../../utilities/allowedExtensions.js";
+import { allowedExtensions } from "../../utilities/allowedExtensions.js";
 
 
 const newsRouter = express.Router()
