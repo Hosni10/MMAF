@@ -238,3 +238,13 @@ export const getAllUser = async(req,res,next) => {
     res.status(201).json({message:"Users",users})
 }
 
+export const getSingleUser = async(req,res,next) => {
+    const {id} = req.params
+    const user = await userModel.findById(id)
+    res.status(201).json({message:"User",user})
+}
+export const UpdateUser = async(req,res,next) => {
+    const {id} = req.params
+    const user = await userModel.findById(id)
+    res.status(201).json({message:"User",user})
+}
