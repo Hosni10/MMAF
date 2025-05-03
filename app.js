@@ -11,7 +11,7 @@ const port = 6060;
 
 app.use(cors());
 
-// app.use(morgan('dev'));
+app.use(morgan('dev'));
 
 // 'combined' - Standard Apache combined log output
 // 'common' - Standard Apache common log output
