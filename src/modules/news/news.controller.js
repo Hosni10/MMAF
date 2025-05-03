@@ -6,8 +6,9 @@ export const addNews = async (req, res, next) => {
   try {
     const { 
       title_ar, title_en, 
-      content_ar, content_en 
+      content_ar, content_en ,category,
     } = req.body;
+
     
     // Validate required fields
     if (!title_ar || !title_en || !content_ar || !content_en) {
@@ -22,7 +23,7 @@ export const addNews = async (req, res, next) => {
     }
     
     // Generate a custom ID for the folder structure
-    const customId = nanoid();
+    const customId = nanoid('1234567890', 5);
     
     // Upload image to ImageKit
     const uploadResult = await imagekit.upload({
@@ -45,6 +46,7 @@ export const addNews = async (req, res, next) => {
         secure_url: uploadResult.url,
         public_id: uploadResult.fileId,
       },
+      category,
       customId
     };
     

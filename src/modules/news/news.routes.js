@@ -7,7 +7,7 @@ import { allowedExtensions } from "../../utilities/allowedExtensions.js";
 const newsRouter = express.Router()
 
 newsRouter.get('/getallnews', getNews)
-newsRouter.post('/addnews',multerCloudFunction(allowedExtensions.Image).single('image'),addNews)
+newsRouter.post('/addNews',multerCloudFunction(allowedExtensions.Image).single('image'),addNews)
 
 newsRouter.put('/:id', multerCloudFunction(allowedExtensions.Image).single('image'), updateNews)
 
@@ -15,3 +15,4 @@ newsRouter.get('/getnewsbyid/:id', getNewsById)
 newsRouter.delete('/:id',deleteNews )
 
 export default newsRouter
+
