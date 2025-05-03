@@ -12,7 +12,6 @@ newsRouter.post('/addnews',multerCloudFunction(allowedExtensions.Image).single('
 newsRouter.put('/:id', multerCloudFunction(allowedExtensions.Image).single('image'), updateNews)
 
 newsRouter.get('/getnewsbyid/:id', getNewsById)
-newsRouter.put('/:id', updateNews)
 newsRouter.delete('/:id',deleteNews )
 
 export default newsRouter

@@ -5,6 +5,7 @@ import userRouter from "./src/modules/auth/auth.routes.js";
 import contactUsRouter from "./src/modules/contactUs/contactUs.routes.js";
 import cors from 'cors'
 import morgan from "morgan";
+import memberRouter from "./src/modules/members/member.routes.js";
 const app = express();
 const port = 6060;
 
@@ -23,6 +24,8 @@ db;
 app.use("/news", newsRouter);
 app.use("/auth", userRouter);
 app.use("/contact", contactUsRouter);
+app.use("/members", memberRouter);
+
 
 app.get("/", (req, res) => res.send("Hello World!"));
 app.listen(port, () => console.log(`Example app listening on port ${port}!`)); 
