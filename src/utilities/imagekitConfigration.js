@@ -1,9 +1,12 @@
 import ImageKit from 'imagekit';
+import { config } from 'dotenv'
+import path from 'path'
+config({path: path.resolve('./config/.env')})
 
 var imagekit = new ImageKit({
-    publicKey : 'public_NKi8+yEnGsfM9yGKqKjl+aeIMkw=',
-    privateKey : 'private_Z1m8hHQMOn2Zse+9PHLmETaWqVU=',
-    urlEndpoint : 'https://ik.imagekit.io/lkz5sclds'
+    publicKey : process.env.PUBLIC_IMAGEKIT_KEY,
+    privateKey :  process.env.PRIVATE_IMAGEKIT_KEY,
+    urlEndpoint :  process.env.URL_ENDPOINT
 });
 
 
