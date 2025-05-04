@@ -6,8 +6,13 @@ import contactUsRouter from "./src/modules/contactUs/contactUs.routes.js";
 import cors from 'cors'
 import morgan from "morgan";
 import memberRouter from "./src/modules/members/member.routes.js";
+import { config } from 'dotenv'
+import path from 'path'
+config({path: path.resolve('./config/.env')})
+import color from "@colors/colors"
+
 const app = express();
-const port = 6060;
+const port = process.env.PORT
 
 app.use(cors());
 
@@ -28,4 +33,4 @@ app.use("/members", memberRouter);
 
 
 app.get("/", (req, res) => res.send("Hello World!"));
-app.listen(port, () => console.log(`Example app listening on port ${port}!`)); 
+app.listen(port, () => console.log(`Example app listening on port ${port}!`.blue)); 

@@ -40,7 +40,6 @@ const newsSchema = new mongoose.Schema({
     },
     customId: {
         type: String,
-        required: true
     }
 })
 

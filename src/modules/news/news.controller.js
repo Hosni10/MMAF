@@ -23,7 +23,7 @@ export const addNews = async (req, res, next) => {
     }
     
     // Generate a custom ID for the folder structure
-    const customId = nanoid('1234567890', 5);
+    const customId = nanoid('abcde1234', 5);
     
     // Upload image to ImageKit
     const uploadResult = await imagekit.upload({
