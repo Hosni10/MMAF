@@ -1,5 +1,6 @@
 import { nanoid } from "nanoid";
 import { membersModel } from "../../../db/models/members.model.js";
+import imagekit, { destroyImage } from "../../utilities/imagekitConfigration.js";
 
 const addMember = async (req, res, next) => {
   try {
@@ -30,7 +31,10 @@ const addMember = async (req, res, next) => {
     const member = new membersModel({
       name: { ar: name_ar, en: name_en },
       position: { ar: position_ar, en: position_en },
-      image: uploadResult,
+      image: {
+        secure_url: uploadResult.url,
+        public_id: uploadResult.fileId,
+      },
       customId,
     });
     await member.save();
@@ -109,8 +113,14 @@ const updateMember = async (req, res, next) => {
     // Handle image update if a new file is provided
     if (req.file) {
       // Delete the old image
+  if (member.image?.public_id) {
+    try {
       await destroyImage(member.image.public_id);
-
+    } catch (err) {
+      console.warn(`Failed to delete old image: ${err.message}`);
+      // Optionally: continue even if deletion fails
+    }
+  }
       // Upload the new image
       const uploadResult = await imagekit.upload({
         file: req.file.buffer,
@@ -120,7 +130,10 @@ const updateMember = async (req, res, next) => {
         }`,
       });
 
-      member.image = uploadResult;
+      member.image = {
+        secure_url: uploadResult.url,
+        public_id: uploadResult.fileId,
+      };
     }
 
     // Save the updated member

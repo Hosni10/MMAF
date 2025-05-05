@@ -12,6 +12,7 @@ var imagekit = new ImageKit({
 
 export const destroyImage = async (fileId) => {
     try {
+      
       const result = await imagekit.deleteFile(fileId);  // Delete the file using its fileId
       // console.log('File deleted:', result);
       return result;
