@@ -128,6 +128,8 @@ const updateMember = async (req, res, next) => {
     // Handle image update if a new file is provided
     if (req.file) {
       // Delete the old image
+  if (member.image?.public_id) {
+    try {
       await destroyImage(member.image.public_id);
       
       // Upload the new image
@@ -145,7 +147,12 @@ const updateMember = async (req, res, next) => {
         public_id: uploadResult.fileId,
       };
     }
-    
+    catch (error) {
+      console.error("Error deleting old image:", error);
+      return res.status(500).json({ message: "Error deleting old image" });
+    }
+  }
+}
     // Save the updated member
     await member.save();
     

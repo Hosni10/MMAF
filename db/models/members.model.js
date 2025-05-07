@@ -32,20 +32,16 @@ const membersSchema = new mongoose.Schema({
             required: true
         }
     },
-    description: {
-        ar: {
-            type: String,
-            // required: true
-        },
-        en: {
-            type: String,
-            // required: true
-        }
-    },
-    customId: {
-        type: String,
-        required: true
-    }
+    // description: {
+    //     ar: {
+    //         type: String,
+    //         required: true
+    //     },
+    //     en: {
+    //         type: String,
+    //         required: true
+    //     }
+    // }
 });
 
 export const membersModel = mongoose.model("members", membersSchema);
