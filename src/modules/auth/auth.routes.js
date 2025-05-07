@@ -20,5 +20,4 @@ userRouter.get('/getAll',getAllUser)
 
 
 
-
 export default userRouter

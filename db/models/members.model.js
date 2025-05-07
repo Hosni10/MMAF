@@ -15,11 +15,11 @@ const membersSchema = new mongoose.Schema({
     image: {
         secure_url: {
             type: String,
-            required: true
+            // required: true
         },
         public_id: {
             type: String,
-            required: true
+            // required: true
         }
     },
     position: {
@@ -35,12 +35,16 @@ const membersSchema = new mongoose.Schema({
     description: {
         ar: {
             type: String,
-            required: true
+            // required: true
         },
         en: {
             type: String,
-            required: true
+            // required: true
         }
+    },
+    customId: {
+        type: String,
+        required: true
     }
 });
 

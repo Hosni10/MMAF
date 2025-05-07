@@ -1,5 +1,6 @@
 import express from "express";
 import { db } from "./db/dbConnection.js";
+import color from "@colors/colors"
 import newsRouter from "./src/modules/news/news.routes.js";
 import userRouter from "./src/modules/auth/auth.routes.js";
 import contactUsRouter from "./src/modules/contactUs/contactUs.routes.js";
@@ -9,7 +10,7 @@ import memberRouter from "./src/modules/members/member.routes.js";
 import { config } from 'dotenv'
 import path from 'path'
 config({path: path.resolve('./config/.env')})
-import color from "@colors/colors"
+import categoryRouter from "./src/modules/category/category.routes.js";
 
 const app = express();
 const port = process.env.PORT
@@ -30,6 +31,8 @@ app.use("/news", newsRouter);
 app.use("/auth", userRouter);
 app.use("/contact", contactUsRouter);
 app.use("/members", memberRouter);
+app.use("/category", categoryRouter);
+ 
 
 
 app.get("/", (req, res) => res.send("Hello World!"));
