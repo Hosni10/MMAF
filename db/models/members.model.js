@@ -15,11 +15,11 @@ const membersSchema = new mongoose.Schema({
     image: {
         secure_url: {
             type: String,
-            required: true
+            // required: true
         },
         public_id: {
             type: String,
-            required: true
+            // required: true
         }
     },
     position: {

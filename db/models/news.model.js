@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+import { model, Schema } from "mongoose";
 
-const newsSchema = new mongoose.Schema({
+const newsSchema = new Schema({
     title: {
         ar:{
         type: String,
@@ -20,19 +20,22 @@ const newsSchema = new mongoose.Schema({
             required: true
         },
     },
-    image: {
-        secure_url: {
+    image: [
+        {
+          secure_url: {
             type: String,
-            required: true
+            // required: true,
+          },
+          public_id: {
+            type: String,
+            // required: true,
+          },
         },
-        public_id:{
-            type: String,
-            required: true
-        }
-    },
+      ],
     category: {
-        type: String,
-        required: true
+        type: Schema.Types.ObjectId,
+        ref: 'category',
+        required:true    
     },
     date: {
         type: Date,
@@ -43,4 +46,4 @@ const newsSchema = new mongoose.Schema({
     }
 })
 
-export const newsModel = mongoose.model('news', newsSchema)
+export const newsModel = model('news', newsSchema)

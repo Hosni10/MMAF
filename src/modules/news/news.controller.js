@@ -1,9 +1,12 @@
 import { newsModel } from "../../../db/models/news.model.js";
 import imagekit, { destroyImage } from "../../utilities/imagekitConfigration.js";
-import { nanoid } from "nanoid";
+
+import { customAlphabet } from 'nanoid'
+const nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', 5)
 
 export const addNews = async (req, res, next) => {
-  try {
+    console.log(req.body);
+    console.log(req.files.map(file => file.fieldname));
     const { 
       title_ar, title_en, 
       content_ar, content_en ,category,
@@ -18,19 +21,29 @@ export const addNews = async (req, res, next) => {
     }
     
     // Check if file is uploaded
-    if (!req.file) {
-      return res.status(400).json({ message: "Please upload news image" });
+    if (!req.files || req.files.length === 0) {
+      return next(new Error("Please upload at least one image for the unit", { cause: 400 }));
     }
     
     // Generate a custom ID for the folder structure
-    const customId = nanoid('abcde1234', 5);
+    const customId = nanoid();
+    console.log(customId);
+    
+    const uploadedImages = [];
     
     // Upload image to ImageKit
-    const uploadResult = await imagekit.upload({
-      file: req.file.buffer,
-      fileName: req.file.originalname,
-      folder: `${process.env.PROJECT_FOLDER || 'MMAF'}/News/${customId}`,
-    });
+    for (const file of req.files) {
+      const uploadResult = await imagekit.upload({
+        file: file.buffer, 
+        fileName: file.originalname,
+        folder: `${process.env.PROJECT_FOLDER}/Units/${customId}`,
+      });
+
+      uploadedImages.push({
+        secure_url: uploadResult.url,
+        public_id: uploadResult.fileId,
+      });
+    }
     
     // Create news object with multilingual data and image
     const newsObject = {
@@ -42,16 +55,14 @@ export const addNews = async (req, res, next) => {
         ar: content_ar,
         en: content_en
       },
-      image: {
-        secure_url: uploadResult.url,
-        public_id: uploadResult.fileId,
-      },
+      image: uploadedImages,
       category,
       customId
     };
     
     // Save to database
     const news = await newsModel.create(newsObject);
+    console.log(news);
     
     // If news creation fails, delete the uploaded image
     if (!news) {
@@ -60,15 +71,14 @@ export const addNews = async (req, res, next) => {
     }
     
     res.status(201).json({ message: "News added successfully", news });
-  } catch (error) {
-    console.error("Error adding news:", error);
-    res.status(500).json({ message: "Error adding news", error: error.message });
-  }
 };
 
 export const getNews = async (req, res, next) => {
   try {
-    const news = await newsModel.find();
+    const news = await newsModel.find().populate({
+      path: 'category',
+      select: 'name' // Add whatever fields you need from the category model
+    });;
     res.status(200).json({ message: "News fetched successfully", news });
   } catch (error) {
     res.status(500).json({ message: "Error fetching news", error });
@@ -99,8 +109,9 @@ export const deleteNews = async (req, res, next) => {
 
 export const updateNews = async (req, res, next) => {
   try {
-    const { title_ar, title_en, content_ar, content_en } = req.body;
+    const { title_ar, title_en, content_ar, content_en ,category} = req.body;
     const id = req.params.id;
+    console.log(req.body);
     
     // Find the news by ID
     const news = await newsModel.findById(id);
@@ -115,6 +126,7 @@ export const updateNews = async (req, res, next) => {
     if (title_en) news.title.en = title_en;
     if (content_ar) news.content.ar = content_ar;
     if (content_en) news.content.en = content_en;
+    
     
     // Handle image update if a new file is provided
     if (req.file) {
