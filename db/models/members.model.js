@@ -1,3 +1,4 @@
+import { time } from "console";
 import mongoose from "mongoose";
 
 
@@ -42,6 +43,6 @@ const membersSchema = new mongoose.Schema({
     //         required: true
     //     }
     // }
-});
+},{timestamps: true});
 
 export const membersModel = mongoose.model("members", membersSchema);
