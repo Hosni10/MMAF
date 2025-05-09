@@ -227,9 +227,8 @@ export const resetPassword = async(req,res,next) => {
 
     const updatedUser = await user.save()
 
-    res.redirect(302, 'http://roomo.ai/success-password-reset.html');
 
-    // res.status(200).json({message: "Done",updatedUser})
+    res.status(200).json({message: "Done",updatedUser})
 
 }
 
@@ -270,9 +269,11 @@ export const addUser = catchError(async(req,res,next) => {
 
 
 export const UpdateUser = async(req,res,next) => {
-    const {userName,phoneNumber} = req.body
-    console.log(req.body);
-    console.log(req.file);
+    const {userName,phoneNumber,email,password,
+        role,
+        isActive} = req.body
+    // console.log(req.body);
+    // console.log(req.file);
     
     const {id} = req.params
     const user = await userModel.findById(id)
@@ -297,10 +298,21 @@ export const UpdateUser = async(req,res,next) => {
           
           if(userName) user.userName = userName
           if(phoneNumber) user.phoneNumber = phoneNumber
-          
+          if(email) user.email = email
+          if(password) user.password = password
+          if(role) user.role = role
+          if(isActive) user.isActive = isActive
+
 
           // save the user 
           await user.save()
           res.status(200).json({message : "user updated successfully",user})     
           
+}
+
+
+export const deleteUser = async(req,res,next) => {
+    const {id} = req.params
+    const user = await userModel.findByIdAndDelete(id)
+    res.status(201).json({message:"User",user})
 }

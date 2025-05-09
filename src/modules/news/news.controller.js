@@ -75,7 +75,7 @@ export const addNews = async (req, res, next) => {
 
 export const getNews = async (req, res, next) => {
   try {
-    const news = await newsModel.find().populate({
+    const news = await newsModel.find().sort({ date: -1 }).populate({
       path: 'category',
       select: 'name.ar name.en' // Add whatever fields you need from the category model
     });;
