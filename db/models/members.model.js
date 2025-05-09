@@ -1,4 +1,3 @@
-import { time } from "console";
 import mongoose from "mongoose";
 
 
@@ -25,7 +24,7 @@ const membersSchema = new mongoose.Schema({
     },
     position: {
         ar: {
-            type: String,
+            type: String, 
             required: true
         },
         en: {
