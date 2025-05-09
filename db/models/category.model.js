@@ -1,9 +1,15 @@
 import { model, Schema } from "mongoose";
 
 const categorySchema = new Schema({
-    name: { 
-        type: String,
-        required: true
+    name: {
+        ar: {
+            type: String,
+            required: true
+        },
+        en: {
+            type: String,
+            required: true
+        }
     },
 });
 
