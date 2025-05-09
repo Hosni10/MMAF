@@ -77,7 +77,7 @@ export const getNews = async (req, res, next) => {
   try {
     const news = await newsModel.find().populate({
       path: 'category',
-      select: 'name' // Add whatever fields you need from the category model
+      select: 'name.ar name.en' // Add whatever fields you need from the category model
     });;
     res.status(200).json({ message: "News fetched successfully", news });
   } catch (error) {
