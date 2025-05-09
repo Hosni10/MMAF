@@ -36,7 +36,7 @@ export const addNews = async (req, res, next) => {
       const uploadResult = await imagekit.upload({
         file: file.buffer, 
         fileName: file.originalname,
-        folder: `${process.env.PROJECT_FOLDER}/Units/${customId}`,
+        folder: `${process.env.PROJECT_FOLDER}/news/${customId}`,
       });
 
       uploadedImages.push({
@@ -75,9 +75,10 @@ export const addNews = async (req, res, next) => {
 
 export const getNews = async (req, res, next) => {
   try {
+
     const news = await newsModel.find().sort({ date: -1 }).populate({
       path: 'category',
-      select: 'name' // Add whatever fields you need from the category model
+      select: 'name' // Select the nested name fields
     });
     res.status(200).json({ message: "News fetched successfully", news });
   } catch (error) {
