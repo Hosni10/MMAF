@@ -1,4 +1,5 @@
 import { model, Schema } from "mongoose";
+import { type } from "os";
 
 const userSchema = new Schema({
     userName: {
@@ -53,7 +54,19 @@ const userSchema = new Schema({
     token: {
         type: String,
         default: null
-    }
+    },
+    verificationCode: { 
+        type: Number,
+        default: null
+    },
+    codeExpiresAt: {
+        type: Date,
+    },
+    forgetCode:{
+        type: Number,
+        default: null
+    },
+
 },{timeseries: true});
 
 export const userModel = model("user", userSchema);

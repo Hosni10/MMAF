@@ -173,3 +173,12 @@ export const getNewsById = async (req, res, next) => {
 
 
 
+
+export const getTenNews = async (req, res, next) => {
+  try {
+    const news = await newsModel.find().sort({ date: -1 }).limit(10);
+    res.status(200).json({ message: "News fetched successfully", news });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching news", error });
+  }
+};
