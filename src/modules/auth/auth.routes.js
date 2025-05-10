@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { forgetPassword, login, logout, resetPassword, signup,getSingleUser, UpdateUser, addUser, getAllUser, deleteUser } from "./auth.controller.js";
+import { forgetPassword, login, logout, resetPassword, signup,getSingleUser, UpdateUser, addUser, getAllUser, deleteUser, getAllLength } from "./auth.controller.js";
 import { multerCloudFunction } from "../../../services/multerCloud.js";
 import { allowedExtensions } from "../../utilities/allowedExtensions.js";
 
@@ -19,6 +19,10 @@ userRouter.put('/update/:id',multerCloudFunction(allowedExtensions.Image).single
 userRouter.get('/getAll',getAllUser)
 userRouter.delete('/:id',deleteUser)
 
+userRouter.get('/getDashboard',getAllLength)
 
+
+userRouter.post("/forget-Password",forgetPassword)
+userRouter.post('/reset-password',resetPassword)
 
 export default userRouter
