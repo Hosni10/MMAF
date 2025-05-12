@@ -9,7 +9,7 @@ import { userModel } from "../../../db/models/user.model.js"
 import catchError from "../../middleware/ErrorHandeling.js"
 import CustomError from "../../utilities/customError.js"
 import jwt from "jsonwebtoken"
-import imagekit from "../../utilities/imagekitConfigration.js"
+import imagekit, { destroyImage } from "../../utilities/imagekitConfigration.js"
 import { membersModel } from "../../../db/models/members.model.js"
 import { newsModel } from "../../../db/models/news.model.js"
 import { tempVerificationModel } from "../../../db/models/OTP_CODE.js"
@@ -276,7 +276,7 @@ export const addUser = catchError(async(req,res,next) => {
 export const UpdateUser = async(req,res,next) => {
     const {userName,phoneNumber,email,password,
         role,
-        isActive} = req.body
+        isActive,} = req.body
     // console.log(req.body);
     // console.log(req.file);
     
@@ -304,21 +304,31 @@ export const UpdateUser = async(req,res,next) => {
           if(userName) user.userName = userName
           if(phoneNumber) user.phoneNumber = phoneNumber
           if(email) user.email = email
-          if(password) user.password = password
           if(role) user.role = role
           if(isActive) user.isActive = isActive
 
+          if(password) {
+            const hashedPassword = pkg.hashSync(password, +process.env.SALT_ROUNDS)
+            user.password = hashedPassword
+          }
 
           // save the user 
           await user.save()
-          res.status(200).json({message : "user updated successfully",user})     
-          
+          res.status(200).json({message : "user updated successfully",user})      
 }
 
 
 export const deleteUser = async(req,res,next) => {
     const {id} = req.params
-    const user = await userModel.findByIdAndDelete(id)
+    
+    const user = await userModel.findById(id)
+  if (user) {
+    const uploadedimage = user.image.public_id
+    if(uploadedimage){
+        await destroyImage(uploadedimage)
+    }
+  }
+  await userModel.findByIdAndDelete(id)
     res.status(201).json({message:"User",user})
 }
 
@@ -387,3 +397,6 @@ export const forgetPassword = async (req, res, next) => {
     const updatedUser = await user.save();
     res.status(200).json({message: "Password reset successfully", updatedUser});
   };
+
+
+  
