@@ -3,10 +3,10 @@ import { sendEmailService } from "../../../services/sendEmail.js";
 
 const submitContactUsForm = async (req, res, next) => {
     try {
-        const { name, email, message, subject } = req.body;
+        const { name, email, message, subject, phone} = req.body;
         
         // Save contact to database
-        const contact = new Contact({name, email, message, subject});
+        const contact = new Contact({name, email, message, subject, phone});
         await contact.save();
         
         // Send email to admin/team
@@ -17,6 +17,7 @@ const submitContactUsForm = async (req, res, next) => {
                 <h2>New Contact Form Submission</h2>
                 <p><strong>Name:</strong> ${name}</p>
                 <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Phone:</strong> ${phone}</p>
                 <p><strong>Subject:</strong> ${subject}</p>
                 <p><strong>Message:</strong> ${message}</p>
             `
