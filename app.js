@@ -38,4 +38,6 @@ app.use("/category", categoryRouter);
 
 
 app.get("/", (req, res) => res.send("Hello World!"));
-app.listen(port, () => console.log(`Example app listening on port ${port}!`.blue)); 
+app.listen(port, () => console.log(`🥟 app port is `.yellow +  ` ${port} 🚩`.blue.underline)); 
+
+// TODO order in members

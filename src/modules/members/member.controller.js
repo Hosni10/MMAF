@@ -55,7 +55,7 @@ const addMember = async (req, res, next) => {
 
 const getMembers = async (req, res, next) => {
   try {
-    const members = await membersModel.find().sort({ _id: -1 });;
+    const members = await membersModel.find().sort({ order : 1 });;
     res.status(200).json({ members });
   } catch (error) {
     res.status(500).json({ message: "Error fetching members", error });
