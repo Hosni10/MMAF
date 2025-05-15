@@ -12,8 +12,9 @@ const addMember = async (req, res, next) => {
     const name_en = req.body.name.en;
     const position_ar = req.body.position.ar;
     const position_en = req.body.position.en;
+    const order = req.body.order;
     
-    if (!name_ar || !name_en || !position_ar || !position_en) {
+    if (!name_ar || !name_en || !position_ar || !position_en || !order) {
       return res.status(400).json({
         message: "All name and position fields are required in both languages",
       });
@@ -42,6 +43,7 @@ const addMember = async (req, res, next) => {
         public_id: uploadResult.fileId,
       }, 
       customId,
+      order,
     });
     await member.save();
 
@@ -104,7 +106,7 @@ const updateMember = async (req, res, next) => {
     console.log(req.body);
     
     // Extract data from the nested structure
-    const { name, position } = req.body;
+    const { name, position, order } = req.body;
     
     // Find the member by ID
     const member = await membersModel.findById(id);
@@ -123,6 +125,9 @@ const updateMember = async (req, res, next) => {
     if (position) {
       if (position.ar) member.position.ar = position.ar;
       if (position.en) member.position.en = position.en;
+    }
+    if (order) {
+      member.order = order;
     }
     
     // Handle image update if a new file is provided

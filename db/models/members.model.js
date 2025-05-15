@@ -1,36 +1,40 @@
 import mongoose from "mongoose";
 
-
-const membersSchema = new mongoose.Schema({
+const membersSchema = new mongoose.Schema(
+  {
     name: {
-        ar: {
-            type: String,
-            required: true
-        },
-        en: {
-            type: String,
-            required: true
-        }
+      ar: {
+        type: String,
+        required: true,
+      },
+      en: {
+        type: String,
+        required: true,
+      },
     },
     image: {
-        secure_url: {
-            type: String,
-            // required: true
-        },
-        public_id: {
-            type: String,
-            // required: true
-        }
+      secure_url: {
+        type: String,
+        // required: true
+      },
+      public_id: {
+        type: String,
+        // required: true
+      },
     },
     position: {
-        ar: {
-            type: String, 
-            required: true
-        },
-        en: {
-            type: String,
-            required: true
-        }
+      ar: {
+        type: String,
+        required: true,
+      },
+      en: {
+        type: String,
+        required: true,
+      },
+    },
+    order: {
+      type: Number,
+      required: true,
     },
     // description: {
     //     ar: {
@@ -42,6 +46,8 @@ const membersSchema = new mongoose.Schema({
     //         required: true
     //     }
     // }
-},{timestamps: true});
+  },
+  { timestamps: true }
+);
 
 export const membersModel = mongoose.model("members", membersSchema);
