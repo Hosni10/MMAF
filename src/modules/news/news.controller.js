@@ -109,7 +109,9 @@ export const deleteNews = async (req, res, next) => {
 
 export const updateNews = async (req, res, next) => {
   try {
-    const { title_ar, title_en, content_ar, content_en, category } = req.body;
+    console.log(req.body);
+    
+    const { title_ar, title_en, content_ar, content_en, category,date} = req.body;
     const id = req.params.id;
 
     console.log(req.body);
@@ -129,18 +131,12 @@ export const updateNews = async (req, res, next) => {
     if (content_ar) news.content.ar = content_ar;
     if (content_en) news.content.en = content_en;
     if (category) news.category = category;
+    if (date) news.date = date;
 
     // Handle multiple image update if new files are provided
     console.log(req.files);
 
     if (req.files && req.files.length > 0) {
-      // Delete all old images
-      if (Array.isArray(news.image)) {
-        for (const img of news.image) {
-          await destroyImage(img.public_id);
-        }
-      }
-
       const uploadedImages = [];
 
       // Upload new images
@@ -157,8 +153,8 @@ export const updateNews = async (req, res, next) => {
         });
       }
 
-      // Replace image array
-      news.image = uploadedImages;
+      // Add new images to existing ones
+      news.image = [...(news.image || []), ...uploadedImages];
     }
 
     // Save the updated news
@@ -187,14 +183,48 @@ export const getNewsById = async (req, res, next) => {
   }
 }   
 
-
-
-
 export const getTenNews = async (req, res, next) => {
   try {
     const news = await newsModel.find().sort({ date: -1 }).limit(10);
     res.status(200).json({ message: "News fetched successfully", news });
   } catch (error) {
     res.status(500).json({ message: "Error fetching news", error });
+  }
+};
+
+export const deleteNewsImage = async (req, res, next) => {
+  try {
+    const { newsId, imageId } = req.params;
+
+    // Find the news by ID
+    const news = await newsModel.findById(newsId);
+    if (!news) {
+      return res.status(404).json({ message: "News not found" });
+    }
+
+    // Find the image in the news item
+    const imageIndex = news.image.findIndex(img => img.public_id === imageId);
+    if (imageIndex === -1) {
+      return res.status(404).json({ message: "Image not found in this news item" });
+    }
+
+    // Delete the image from ImageKit
+    await destroyImage(imageId);
+
+    // Remove the image from the news item's image array
+    news.image.splice(imageIndex, 1);
+
+    // Save the updated news
+    await news.save();
+
+    res.status(200).json({ 
+      message: "Image deleted successfully", 
+      news 
+    });
+  } catch (error) {
+    console.error("Error deleting image:", error);
+    res.status(500).json({ 
+      message: `Failed to delete image: ${error.message}` 
+    });
   }
 };

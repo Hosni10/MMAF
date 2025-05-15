@@ -1,22 +1,21 @@
-import { userModel } from '../../Database/models/user.model.js'
+import { userModel } from '../../db/models/user.model.js';
 import CustomError from '../utilities/customError.js'
-import { generateToken, verifyToken } from '../utilities/tokenFunctions.js'
+import { generateToken, verifyToken } from '../utilities/tokenFunctions.js';
 
 export const isAuth = (roles) => {
   return async (req, res, next) => {
     try {
+      
       const { authorization } = req.headers
       if (!authorization) {
         return next(new CustomError('Please login first',  400 ))
       }
 
-      // if (!authorization.startsWith('ecomm__')) {
-      //   return next(new Error('invalid token prefix', { cause: 400 }))
-      // }
-      // console.log(authorization);
+      if (!authorization.startsWith('MMA')) {
+        return next(new Error('invalid token prefix', { cause: 400 }))
+      }
       
       const splitedToken = authorization.split(' ')[1]
-      // console.log(splitedToken);
       
       try {
         const decodedData = verifyToken({

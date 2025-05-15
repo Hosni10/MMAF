@@ -8,7 +8,7 @@ const submitContactUsForm = async (req, res, next) => {
     // Save contact to database
     const contact = new Contact({ name, email, message, subject, phone });
     await contact.save();
-
+    const currentDate = new Date();
     // Send email to admin/team
     await sendEmailService({
       to: "uaemmaf2025@gmail.com", // Your company's email address
@@ -75,7 +75,7 @@ const submitContactUsForm = async (req, res, next) => {
             `,
     });
 
-   // Send confirmation email to the sender
+  //  // Send confirmation email to the sender
     await sendEmailService({
         to: email,
         subject: "Thank you for contacting UAEMMAF",
@@ -98,3 +98,4 @@ const submitContactUsForm = async (req, res, next) => {
 };
 
 export default submitContactUsForm;
+

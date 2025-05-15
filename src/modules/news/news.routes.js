@@ -1,5 +1,5 @@
 import express from "express";
-import { addNews, deleteNews, getNews, getNewsById, getTenNews, updateNews } from "./news.controller.js";
+import { addNews, deleteNews, getNews, getNewsById, getTenNews, updateNews ,deleteNewsImage} from "./news.controller.js";
 import { multerCloudFunction } from "../../../services/multerCloud.js";
 import { allowedExtensions } from "../../utilities/allowedExtensions.js";
 
@@ -14,6 +14,7 @@ newsRouter.put('/:id',multerCloudFunction(allowedExtensions.Image).array("image"
 newsRouter.get('/getnewsbyid/:id', getNewsById)
 newsRouter.delete('/:id',deleteNews )
 newsRouter.get('/getLastTenNews', getTenNews)
+newsRouter.delete('/deleteNewsImage/:newsId/:imageId',deleteNewsImage)
 
 export default newsRouter
 

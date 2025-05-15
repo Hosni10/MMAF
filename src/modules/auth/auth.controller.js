@@ -1,4 +1,3 @@
-
 // import {sendEmailService} from "../../services/sendEmail.js"
 // import { userModel } from "../../../Database/models/user.model.js"
 // import { emailTemplate } from "../../utilities/emailTemplate.js"
@@ -81,6 +80,9 @@ console.log(req.body);
         return next(new CustomError('user not found',404))
     } 
 
+    if(userExsist.isActive == false){
+        return next(new CustomError('user is not active',404))
+    }
     // if(userExsist.isConfirmed == false){
     //   return next(new CustomError('please confirm your email first',404))
     // }
@@ -250,6 +252,8 @@ export const getSingleUser = async(req,res,next) => {
 
 export const addUser = catchError(async(req,res,next) => {
     const {userName,email,password,phoneNumber,role} = req.body
+    console.log(req.authUser);
+    
     console.log(req.body);
     
     const isExist = await userModel.findOne({email})
@@ -279,6 +283,7 @@ export const UpdateUser = async(req,res,next) => {
         isActive,} = req.body
     // console.log(req.body);
     // console.log(req.file);
+    console.log(req.authUser);
     
     const {id} = req.params
     const user = await userModel.findById(id)
@@ -398,5 +403,46 @@ export const forgetPassword = async (req, res, next) => {
     res.status(200).json({message: "Password reset successfully", updatedUser});
   };
 
+export const verifyUserToken = async (req, res, next) => {
+  try {
+    const { authorization } = req.headers;
+    if (!authorization) {
+      return next(new CustomError('Please login first', 400));
+    }
+
+    const token = authorization.split(' ')[1];
+    
+    try {
+      const decodedData = verifyToken({
+        token,
+        signature: process.env.SIGN_IN_TOKEN_SECRET || "Login",
+      });
+
+      const user = await userModel.findById(decodedData._id);
+      
+      if (!user) {
+        return next(new CustomError('User not found', 404));
+      }
+
+      // Return user data without sensitive information
+      const userData = {
+        _id: user._id,
+        userName: user.userName,
+        email: user.email,
+        role: user.role,
+        isActive: user.isActive
+      };
+
+      res.status(200).json({ user: userData });
+    } catch (error) {
+      if (error.name === 'TokenExpiredError') {
+        return next(new CustomError('Token expired', 401));
+      }
+      return next(new CustomError('Invalid token', 401));
+    }
+  } catch (error) {
+    next(new CustomError('Error verifying token', 500));
+  }
+};
 
   
