@@ -11,7 +11,7 @@ const submitContactUsForm = async (req, res, next) => {
 
     // Send email to admin/team
     await sendEmailService({
-      to: "Web@uaemmaf.com", // Your company's email address
+      to: "uaemmaf2025@gmail.com", // Your company's email address
       subject: `New Contact Form Submission: ${subject}`,
       message: `
 <div style="background-color:#f8f9fa; color:#333333; font-family:'Segoe UI', Arial, sans-serif; padding:40px; border-radius:10px; max-width:650px; margin:auto; box-shadow:0 4px 15px rgba(0,0,0,0.1);">
