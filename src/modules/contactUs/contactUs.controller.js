@@ -75,18 +75,18 @@ const submitContactUsForm = async (req, res, next) => {
             `,
     });
 
-    // Send confirmation email to the sender
-    // await sendEmailService({
-    //     to: email,
-    //     subject: "Thank you for contacting UAEMMAF",
-    //     message: `
-    //         <h2>Thank you for your inquiry</h2>
-    //         <p>Dear ${name},</p>
-    //         <p>Thank you very much for your inquiry, one of UAEMMAF team will contact you shortly.</p>
-    //         <p>Best regards,</p>
-    //         <p>UAEMMAF Team</p>
-    //     `
-    // });
+   // Send confirmation email to the sender
+    await sendEmailService({
+        to: email,
+        subject: "Thank you for contacting UAEMMAF",
+        message: `
+            <h2>Thank you for your inquiry</h2>
+            <p>Dear ${name},</p>
+            <p>Thank you very much for your inquiry, one of UAEMMAF team will contact you shortly.</p>
+            <p>Best regards,</p>
+            <p>UAEMMAF Team</p>
+        `
+    });
 
     res.status(200).json({ message: "Message submitted successfully!" });
   } catch (error) {
