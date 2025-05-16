@@ -1,5 +1,5 @@
 import { userModel } from '../../db/models/user.model.js';
-import CustomError from '../utilities/customError.js'
+import CustomError from '../utilities/customError.js';
 import { generateToken, verifyToken } from '../utilities/tokenFunctions.js';
 
 export const isAuth = (roles) => {
@@ -38,7 +38,8 @@ export const isAuth = (roles) => {
         // console.log(findUser.role);
         // ~ Authorization error
         if(!roles.includes(findUser.role)){
-          return next(new CustomError('UnAuthorized to access this api',  400 ))
+          return res.status(400).json({message:'UnAuthorized to access this api'})
+          // return next(new CustomError('UnAuthorized to access this api',  400 ))
         }
         req.authUser = findUser
         next()
