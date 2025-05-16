@@ -322,6 +322,40 @@ export const UpdateUser = async(req,res,next) => {
           res.status(200).json({message : "user updated successfully",user})      
 }
 
+export const updateProfile = async (req,res,next) => {
+   const {userName,phoneNumber,email,password} = req.body
+
+    const {id} = req.params
+    const user = await userModel.findById(id)    
+
+    if(!user) {
+        return next(new Error("user Didn't Found",{cause:400}))
+      }
+        // Check if file is uploaded
+        if (req.file) {
+            // Upload image to ImageKit
+            const uploadResult = await imagekit.upload({
+              file: req.file.buffer,
+              fileName: req.file.originalname,
+              folder: `${process.env.PROJECT_FOLDER || 'MMAF'}/User/${user.customId}`,
+            });
+            user.image.secure_url = uploadResult.url
+            user.image.public_id = uploadResult.fileId
+          }
+          
+          if(userName) user.userName = userName
+          if(phoneNumber) user.phoneNumber = phoneNumber
+          if(email) user.email = email
+
+          if(password) {
+            const hashedPassword = pkg.hashSync(password, +process.env.SALT_ROUNDS)
+            user.password = hashedPassword
+          }
+
+          // save the user 
+          await user.save()
+          res.status(200).json({message : "user updated successfully",user})      
+}
 
 export const deleteUser = async(req,res,next) => {
     const {id} = req.params
