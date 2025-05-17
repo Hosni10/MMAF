@@ -65,9 +65,9 @@ const submitContactUsForm = async (req, res, next) => {
     <img src="https://uaemmaf.vercel.app/logo3.png" alt="UAE MMAF Logo" style="max-height:50px; margin-bottom:15px; ">
 
     <p style="margin:10px 0 0;">
-      <a href="https://uaemmaf.ae" style="color:#c12026; text-decoration:none; font-weight:500; margin:0 10px;">Website</a>
-      <a href="https://uaemmaf.ae/contact" style="color:#c12026; text-decoration:none; font-weight:500; margin:0 10px;">Contact</a>
-      <span href="https://uaemmaf.ae/privacy-policy" style="color:#c12026; text-decoration:none; font-weight:500; margin:0 10px;">Privacy Policy</span>
+      <a href="https://uaemmaf.com" style="color:#c12026; text-decoration:none; font-weight:500; margin:0 10px;">Website</a>
+      <a href="https://uaemmaf.com/contact" style="color:#c12026; text-decoration:none; font-weight:500; margin:0 10px;">Contact</a>
+      <span href="#" style="color:#c12026; text-decoration:none; font-weight:500; margin:0 10px;">Privacy Policy</span>
     </p>
     <p style="margin:15px 0 0;">© ${new Date().getFullYear()} UAE Mixed Martial Arts Federation. All rights reserved.</p>
   </footer>
