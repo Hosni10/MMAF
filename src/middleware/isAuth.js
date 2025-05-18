@@ -2,7 +2,7 @@ import { userModel } from '../../db/models/user.model.js';
 import CustomError from '../utilities/customError.js';
 import { generateToken, verifyToken } from '../utilities/tokenFunctions.js';
 
-export const isAuth = (roles) => {
+export const isAuth =  (roles) => {
   return async (req, res, next) => {
     try {
       
@@ -12,7 +12,7 @@ export const isAuth = (roles) => {
       }
 
       if (!authorization.startsWith('MMA')) {
-        return next(new Error('invalid token prefix', { cause: 400 }))
+        return next(new CustomError('invalid token prefix', { cause: 400 }))
       }
       
       const splitedToken = authorization.split(' ')[1]
@@ -38,8 +38,8 @@ export const isAuth = (roles) => {
         // console.log(findUser.role);
         // ~ Authorization error
         if(!roles.includes(findUser.role)){
-          return res.status(400).json({message:'UnAuthorized to access this api'})
-          // return next(new CustomError('UnAuthorized to access this api',  400 ))
+          // return res.status(400).json({message:'UnAuthorized to access this api'})
+          return next(new CustomError('UnAuthorized to access this api',  400 ))
         }
         req.authUser = findUser
         next()
@@ -48,9 +48,9 @@ export const isAuth = (roles) => {
         if (error == 'TokenExpiredError: jwt expired') {
           // refresh token
           const user = await userModel.findOne({ token: splitedToken })
-          if (!user) {
+          if (!user) {            
             return next(new CustomError('Wrong Token - Token not found in user data',  400 ))
-          }
+          } 
           // generate new token
           const userToken = generateToken({
             payload: {
@@ -70,6 +70,7 @@ export const isAuth = (roles) => {
           await userModel.findOneAndUpdate(
             { token: splitedToken },
             { token: userToken },
+            {new: true},
           )
           return res.status(401).json({ message: 'Token refreshed', userToken })
         }

@@ -43,33 +43,10 @@ export const signup = async(req,res,next) => {
     res.status(201).json({message:'done', saveUser})
 }
 
-// export const confirmEmail = async(req,res,next) => {
-//     const {token} = req.params
-
-//     const decode = verifyToken({
-//         token,
-//         signature: process.env.CONFIRMATION_EMAIL_TOKEN, // ! process.env.CONFIRMATION_EMAIL_TOKEN
-//     })
-//     const user = await userModel.findOneAndUpdate(
-//         {email: decode?.email, isConfirmed:false},
-//         {isConfirmed: true},
-//         {new:true},
-//         )
-        
-//         if(!user){
-//             return res.status(400).json({message:'already confirmed'})
-//         }
-
-
-//         return res.status(200).json({message:'confirmed done, now log in'})
-
-// }
-
 
 export const login = catchError(async(req,res,next) => {
     const {email,password} = req.body
-console.log(req.body);
-
+ 
      
     if(!email || !password){
         return next(new CustomError('Email And Password Is Required',  422 ))
@@ -77,23 +54,18 @@ console.log(req.body);
 
     const userExsist = await userModel.findOne({email})
     if(!userExsist){
-        return next(new CustomError('user not found',404))
+        return next(new CustomError('user not found',401))
     } 
 
     if(userExsist.isActive == false){
-        return next(new CustomError('user is not active',404))
+        return next(new CustomError('user is not active',401))
     }
-    // if(userExsist.isConfirmed == false){
-    //   return next(new CustomError('please confirm your email first',404))
-    // }
-    // console.log(password);
+
     
     const passwordExsist = pkg.compareSync(password,userExsist.password)
-    // console.log(passwordExsist);
-    // console.log(userExsist.password);
-    
+ 
     if(!passwordExsist){
-        return next(new CustomError('password incorrect',404))
+        return next(new CustomError('password incorrect',401))
     }
 
     const token = generateToken({
@@ -103,7 +75,7 @@ console.log(req.body);
             role: userExsist.role
         },
         signature: process.env.SIGN_IN_TOKEN_SECRET || "Login", // ! process.env.SIGN_IN_TOKEN_SECRET
-        expiresIn: '1d',
+        expiresIn: '1m',
      })
      
 
@@ -446,7 +418,6 @@ export const verifyUserToken = async (req, res, next) => {
 
     const token = authorization.split(' ')[1];
     
-    try {
       const decodedData = verifyToken({
         token,
         signature: process.env.SIGN_IN_TOKEN_SECRET || "Login",
@@ -458,14 +429,6 @@ export const verifyUserToken = async (req, res, next) => {
         return next(new CustomError('User not found', 404));
       }
 
-      // Return user data without sensitive information
-      const userData = {
-        _id: user._id,
-        userName: user.userName,
-        email: user.email,
-        role: user.role,
-        isActive: user.isActive
-      };
 
       res.status(200).json({ user: userData });
     } catch (error) {
@@ -474,9 +437,6 @@ export const verifyUserToken = async (req, res, next) => {
       }
       return next(new CustomError('Invalid token', 401));
     }
-  } catch (error) {
-    next(new CustomError('Error verifying token', 500));
-  }
 };
 
   
