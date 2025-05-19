@@ -44,6 +44,6 @@ const newsSchema = new Schema({
     customId: {
         type: String,
     }
-})
+},{timestamps:true})
 
 export const newsModel = model('news', newsSchema)

@@ -299,7 +299,8 @@ export const updateProfile = async (req,res,next) => {
 
     const {id} = req.params
     const user = await userModel.findById(id)    
-
+  console.log(user);
+  
     if(!user) {
         return next(new Error("user Didn't Found",{cause:400}))
       }
