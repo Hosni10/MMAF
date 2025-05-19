@@ -24,12 +24,12 @@ export const isAuth =  (roles) => {
         })
         // console.log("decodedData: ",decodedData);
         // console.log("decodedData: ",decodedData._id);
-        
+         
         const findUser = await userModel.findById(
           decodedData._id,
           'email userName role',
         )
-             
+            
         
         if (!findUser) {
           return next(new CustomError('Please SignUp',  400 ))

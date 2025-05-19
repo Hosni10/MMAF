@@ -228,3 +228,84 @@ export const deleteNewsImage = async (req, res, next) => {
     });
   }
 };
+
+
+export const getNewsChartData = async (req, res) => {
+    try {
+        // الحصول على السنة من الاستعلام أو استخدام السنة الحالية كقيمة افتراضية
+        const year = req.query.year ? parseInt(req.query.year) : new Date().getFullYear();
+        
+        // إنشاء مصفوفة تجميع للحصول على عدد الأخبار لكل شهر
+        const pipeline = [
+            {
+                $match: {
+                    $expr: {
+                        $eq: [{ $year: "$createdAt" }, year]
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: { $month: "$createdAt" },
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { _id: 1 }
+            },
+            {
+                $project: {
+                    month: "$_id",
+                    count: 1,
+                    _id: 0
+                }
+            }
+        ];
+
+        // تنفيذ استعلام التجميع
+        const monthlyStats = await newsModel.aggregate(pipeline);
+        
+        // تحويل النتائج إلى تنسيق مناسب للرسم البياني
+        const months = [
+            "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", 
+            "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"
+        ];
+        
+        // إنشاء مصفوفة كاملة للأشهر مع القيم الصفرية للأشهر التي لا تحتوي على بيانات
+        const formattedStats = months.map((monthName, index) => {
+            const monthData = monthlyStats.find(item => item.month === index + 1);
+            return {
+                month: monthName,
+                count: monthData ? monthData.count : 0
+            };
+        });
+        
+        return res.status(200).json({
+            success: true,
+            message: "تم الحصول على بيانات الرسم البياني بنجاح",
+            data: {
+                year,
+                stats: formattedStats,
+                chartData: {
+                    labels: formattedStats.map(item => item.month),
+                    datasets: [
+                        {
+                            label: "عدد الأخبار",
+                            data: formattedStats.map(item => item.count),
+                            backgroundColor: "#c0392b",
+                            borderColor: "#c0392b",
+                            borderWidth: 1
+                        }
+                    ]
+                }
+            }
+        });
+    } catch (error) {
+        console.error("خطأ في الحصول على بيانات الرسم البياني:", error);
+        return res.status(500).json({
+            success: false,
+            message: "حدث خطأ أثناء معالجة الطلب",
+            error: error.message
+        });
+    }
+};
