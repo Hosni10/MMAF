@@ -20,7 +20,7 @@ export const isAuth =  (roles) => {
       try {
         const decodedData = verifyToken({
           token: splitedToken,
-          signature: process.env.SIGN_IN_TOKEN_SECRET, // ! process.env.SIGN_IN_TOKEN_SECRET STITCH
+          signature: process.env.SIGN_IN_TOKEN_SECRET,
         })
         // console.log("decodedData: ",decodedData);
         // console.log("decodedData: ",decodedData._id);
@@ -37,9 +37,10 @@ export const isAuth =  (roles) => {
         // console.log(roles);
         // console.log(findUser.role);
         // ~ Authorization error
-        if(!roles.includes(findUser.role)){
+        if(!roles.includes(findUser.role)){          
           // return res.status(400).json({message:'UnAuthorized to access this api'})
           return next(new CustomError('UnAuthorized to access this api',  400 ))
+
         }
         req.authUser = findUser
         next()
