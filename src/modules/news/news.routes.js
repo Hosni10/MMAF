@@ -15,7 +15,7 @@ newsRouter.get('/getnewsbyid/:id', getNewsById)
 newsRouter.delete('/:id',deleteNews )
 newsRouter.get('/getLastTenNews', getTenNews)
 newsRouter.delete('/deleteNewsImage/:newsId/:imageId',deleteNewsImage)
-newsRouter.get('/getNewsCharts/', getNewsChartData)
+newsRouter.get('/getNewsCharts', getNewsChartData)
 
 
 
