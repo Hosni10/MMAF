@@ -240,13 +240,13 @@ export const getNewsChartData = async (req, res) => {
             {
                 $match: {
                     $expr: {
-                        $eq: [{ $year: "$createdAt" }, year]
+                        $eq: [{ $year: "$date" }, year]
                     }
                 }
             },
             {
                 $group: {
-                    _id: { $month: "$createdAt" },
+                    _id: { $month: "$date" },
                     count: { $sum: 1 }
                 }
             },
@@ -267,7 +267,7 @@ export const getNewsChartData = async (req, res) => {
         
         // تحويل النتائج إلى تنسيق مناسب للرسم البياني
         const months = [
-            "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", 
+            "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
             "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"
         ];
         
@@ -309,6 +309,7 @@ export const getNewsChartData = async (req, res) => {
         });
     }
 };
+
 
 
 
