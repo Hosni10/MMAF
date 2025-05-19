@@ -309,3 +309,40 @@ export const getNewsChartData = async (req, res) => {
         });
     }
 };
+
+
+
+export const getNewsByMonth = async (req, res, next) => {
+  try {
+    // Get current date
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    // Get first and last day of current month
+    const firstDay = new Date(currentYear, currentMonth, 1);
+    const lastDay = new Date(currentYear, currentMonth + 1, 0);
+
+    // Count news in current month
+    const count = await newsModel.countDocuments({
+      date: {
+        $gte: firstDay,
+        $lte: lastDay,
+      },
+    });
+
+    res.status(200).json({
+      message: "News count for current month fetched successfully",
+      data: {
+        count,
+        month: now.toLocaleString("default", { month: "long" }),
+        year: currentYear,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error fetching news count",
+      error: error.message,
+    });
+  }
+};
