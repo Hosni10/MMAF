@@ -251,10 +251,14 @@ export const addUser = catchError(async(req,res,next) => {
         password:hashedPassword,
         phoneNumber,
         role,
-        isActive
+        isActive,
+        image: {
+            secure_url: req.file.secure_url,
+            public_id: req.file.public_id,
+          }
     })
 
-   const userData =  user.save()
+  //  const userData =  user.save()
 
    res.status(201).json({message:"User",userData})
 
