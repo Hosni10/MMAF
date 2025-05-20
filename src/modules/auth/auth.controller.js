@@ -258,7 +258,6 @@ export const addUser = catchError(async(req,res,next) => {
           }
     })
 
-   const userData =  user.save()
 
    res.status(201).json({message:"User",userData})
 
