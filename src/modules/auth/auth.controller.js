@@ -212,7 +212,8 @@ export const logout = async (req, res, next) => {
 // }
 
 export const getAllUser = async(req,res,next) => {
-    const users = await userModel.find()
+    const users = await userModel.find().select('-password');
+
     res.status(201).json({message:"Users",users})
 }
 
@@ -259,7 +260,7 @@ export const addUser = catchError(async(req,res,next) => {
     })
 
 
-   res.status(201).json({message:"User",userData})
+   res.status(201).json({message:"User Created",user})
 
 })
 
