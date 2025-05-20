@@ -232,6 +232,16 @@ export const addUser = catchError(async(req,res,next) => {
     if(isExist){
         return next(new CustomError('Email is Already exsisted',  400 ))
     }
+            if (req.file) {
+            // Upload image to ImageKit
+            const uploadResult = await imagekit.upload({
+              file: req.file.buffer,
+              fileName: req.file.originalname,
+              folder: `${process.env.PROJECT_FOLDER || 'MMAF'}/User/${user.customId}`,
+            });
+            user.image.secure_url = uploadResult.url
+            user.image.public_id = uploadResult.fileId
+          }
 
     const hashedPassword = pkg.hashSync(password, +process.env.SALT_ROUNDS)
     const user = new userModel({
