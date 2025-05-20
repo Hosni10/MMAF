@@ -75,7 +75,7 @@ export const login = catchError(async(req,res,next) => {
             role: userExsist.role
         },
         signature: process.env.SIGN_IN_TOKEN_SECRET || "Login", // ! process.env.SIGN_IN_TOKEN_SECRET
-        expiresIn: '1m',
+        expiresIn: '1w',
      })
      
 
@@ -218,15 +218,16 @@ export const getAllUser = async(req,res,next) => {
 
 export const getSingleUser = async(req,res,next) => {
     const {id} = req.params
-    const user = await userModel.findById(id)
+    const user = await userModel.findById(id).select('-password');
     res.status(201).json({message:"User",user})
 }
 
 export const addUser = catchError(async(req,res,next) => {
-    const {userName,email,password,phoneNumber,role} = req.body
+    const {userName,email,password,phoneNumber,role,isActive} = req.body
     console.log(req.authUser);
     
     console.log(req.body);
+    console.log(req.file);
     
     const isExist = await userModel.findOne({email})
     if(isExist){
@@ -249,7 +250,8 @@ export const addUser = catchError(async(req,res,next) => {
         email,
         password:hashedPassword,
         phoneNumber,
-        role
+        role,
+        isActive
     })
 
    const userData =  user.save()
