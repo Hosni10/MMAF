@@ -223,46 +223,46 @@ export const getSingleUser = async(req,res,next) => {
     res.status(201).json({message:"User",user})
 }
 
-export const addUser = catchError(async(req,res,next) => {
-    const {userName,email,password,phoneNumber,role,isActive} = req.body
-    console.log(req.authUser);
-    
-    console.log(req.body);
-    console.log(req.file);
-    
-    const isExist = await userModel.findOne({email})
-    if(isExist){
-        return next(new CustomError('Email is Already exsisted',  400 ))
+export const addUser = catchError(async (req, res, next) => {
+  const { userName, email, password, phoneNumber, role, isActive } = req.body;
+
+  
+  const isExist = await userModel.findOne({ email });
+  if (isExist) {
+    return next(new CustomError('Email is already existed', 400));
+  }
+
+  const hashedPassword = pkg.hashSync(password, +process.env.SALT_ROUNDS);
+
+  const user = new userModel({
+    userName,
+    email,
+    password: hashedPassword,
+    phoneNumber,
+    role,
+    isActive,
+    image: {
+      secure_url: '',
+      public_id: ''
     }
-            if (req.file) {
-            // Upload image to ImageKit
-            const uploadResult = await imagekit.upload({
-              file: req.file.buffer,
-              fileName: req.file.originalname,
-              folder: `${process.env.PROJECT_FOLDER || 'MMAF'}/User/${user.customId}`,
-            });
-            user.image.secure_url = uploadResult.url
-            user.image.public_id = uploadResult.fileId
-          }
+  });
 
-    const hashedPassword = pkg.hashSync(password, +process.env.SALT_ROUNDS)
-    const user = new userModel({
-        userName,
-        email,
-        password:hashedPassword,
-        phoneNumber,
-        role,
-        isActive,
-        image: {
-            secure_url: req.file.secure_url,
-            public_id: req.file.public_id,
-          }
-    })
+  if (req.file) {
+    const uploadResult = await imagekit.upload({
+      file: req.file.buffer,
+      fileName: req.file.originalname,
+      folder: `${process.env.PROJECT_FOLDER || 'MMAF'}/User/${user._id}`, // Use _id instead of customId unless defined
+    });
 
+    user.image.secure_url = uploadResult.url;
+    user.image.public_id = uploadResult.fileId;
+  }
 
-   res.status(201).json({message:"User Created",user})
+  await user.save();
 
-})
+  res.status(201).json({ message: 'User Created', user });
+});
+
 
 
 export const UpdateUser = async(req,res,next) => {
