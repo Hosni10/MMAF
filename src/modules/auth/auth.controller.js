@@ -226,26 +226,24 @@ export const getSingleUser = async(req,res,next) => {
 export const addUser = catchError(async (req, res, next) => {
   const { userName, email, password, phoneNumber, role, isActive } = req.body;
 
+  // Validate required fields
+  if (!userName || !email || !password || !phoneNumber || !role) {
+    return next(new CustomError("All fields are required", 400));
+  }
 
+  // Check if email already exists
   const isExist = await userModel.findOne({ email });
   if (isExist) {
-    return next(new CustomError('Email is already existed', 400));
+    return next(new CustomError("Email is already existed", 400));
   }
 
+  // Hash the password
   const hashedPassword = pkg.hashSync(password, +process.env.SALT_ROUNDS);
 
-    if (req.file) {
-    const uploadResult = await imagekit.upload({
-      file: req.file.buffer,
-      fileName: req.file.originalname,
-      folder: `${process.env.PROJECT_FOLDER || 'MMAF'}/User/${user._id}`, // Use _id instead of customId unless defined
-    });
+  // Generate custom ID for image folder
+  const customId = nanoid();
 
-    user.image.secure_url = uploadResult.url;
-    user.image.public_id = uploadResult.fileId;
-  }
-
-  
+  // Prepare user object
   const user = new userModel({
     userName,
     email,
@@ -253,17 +251,28 @@ export const addUser = catchError(async (req, res, next) => {
     phoneNumber,
     role,
     isActive,
-    image: {
-      secure_url: '',
-      public_id: ''
-    }
+    customId,
   });
 
+  // Handle file upload if image exists
+  if (req.file) {
+    const uploadResult = await imagekit.upload({
+      file: req.file.buffer,
+      fileName: req.file.originalname,
+      folder: `${process.env.PROJECT_FOLDER || 'MMAF'}/User/${customId}`,
+    });
+
+    user.image = {
+      secure_url: uploadResult.url,
+      public_id: uploadResult.fileId,
+    };
+  }
 
   await user.save();
 
-  res.status(201).json({ message: 'User Created', user });
+  res.status(201).json({ message: "User created successfully", user });
 });
+
 
 
 
