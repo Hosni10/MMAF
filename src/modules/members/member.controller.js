@@ -3,55 +3,56 @@ import imagekit, { destroyImage } from "../../utilities/imagekitConfigration.js"
 import { customAlphabet } from 'nanoid'
 const nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', 5)
 
-const addMember = async (req, res, next) => {
-  try {
+export const addUser = catchError(async (req, res, next) => {
+  const { userName, email, password, phoneNumber, role, isActive } = req.body;
 
-    console.log(req.body);
-    
-    const name_ar = req.body.name.ar;
-    const name_en = req.body.name.en;
-    const position_ar = req.body.position.ar;
-    const position_en = req.body.position.en;
-    const order = req.body.order;
-    
-    if (!name_ar || !name_en || !position_ar || !position_en || !order) {
-      return res.status(400).json({
-        message: "All name and position fields are required in both languages",
-      });
-    }
+  // Validate required fields
+  if (!userName || !email || !password || !phoneNumber || !role) {
+    return next(new CustomError("All fields are required", 400));
+  }
 
-    // Check if file is uploaded
-    if (!req.file) {
-      return res.status(400).json({ message: "Please upload member image" });
-    }
+  // Check if email already exists
+  const isExist = await userModel.findOne({ email });
+  if (isExist) {
+    return next(new CustomError("Email is already existed", 400));
+  }
 
-    // Generate a custom ID for the folder structure
-    const customId = nanoid();
+  // Hash the password
+  const hashedPassword = pkg.hashSync(password, +process.env.SALT_ROUNDS);
 
-    // Upload image to ImageKit
+  // Generate custom ID for image folder
+  const customId = nanoid();
+
+  // Prepare user object
+  const user = new userModel({
+    userName,
+    email,
+    password: hashedPassword,
+    phoneNumber,
+    role,
+    isActive,
+    customId,
+  });
+
+  // Handle file upload if image exists
+  if (req.file) {
     const uploadResult = await imagekit.upload({
       file: req.file.buffer,
       fileName: req.file.originalname,
-      folder: `${process.env.PROJECT_FOLDER || "MMAF"}/Members/${customId}`,
+      folder: `${process.env.PROJECT_FOLDER || 'MMAF'}/User/${customId}`,
     });
 
-    const member = new membersModel({
-      name: { ar: name_ar, en: name_en },
-      position: { ar: position_ar, en: position_en },
-      image: {
-        secure_url: uploadResult.url,
-        public_id: uploadResult.fileId,
-      }, 
-      customId,
-      order,
-    });
-    await member.save();
-
-    res.status(200).json({ message: "Member added successfully" , member });
-  } catch (error) {
-    res.status(500).json({ message: "Error adding member", error });
+    user.image = {
+      secure_url: uploadResult.url,
+      public_id: uploadResult.fileId,
+    };
   }
-}
+
+  await user.save();
+
+  res.status(201).json({ message: "User created successfully", user });
+});
+
 
 const getMembers = async (req, res, next) => {
   try {

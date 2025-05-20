@@ -226,7 +226,7 @@ export const getSingleUser = async(req,res,next) => {
 export const addUser = catchError(async (req, res, next) => {
   const { userName, email, password, phoneNumber, role, isActive } = req.body;
 
-  
+
   const isExist = await userModel.findOne({ email });
   if (isExist) {
     return next(new CustomError('Email is already existed', 400));
@@ -234,6 +234,18 @@ export const addUser = catchError(async (req, res, next) => {
 
   const hashedPassword = pkg.hashSync(password, +process.env.SALT_ROUNDS);
 
+    if (req.file) {
+    const uploadResult = await imagekit.upload({
+      file: req.file.buffer,
+      fileName: req.file.originalname,
+      folder: `${process.env.PROJECT_FOLDER || 'MMAF'}/User/${user._id}`, // Use _id instead of customId unless defined
+    });
+
+    user.image.secure_url = uploadResult.url;
+    user.image.public_id = uploadResult.fileId;
+  }
+
+  
   const user = new userModel({
     userName,
     email,
@@ -247,16 +259,6 @@ export const addUser = catchError(async (req, res, next) => {
     }
   });
 
-  if (req.file) {
-    const uploadResult = await imagekit.upload({
-      file: req.file.buffer,
-      fileName: req.file.originalname,
-      folder: `${process.env.PROJECT_FOLDER || 'MMAF'}/User/${user._id}`, // Use _id instead of customId unless defined
-    });
-
-    user.image.secure_url = uploadResult.url;
-    user.image.public_id = uploadResult.fileId;
-  }
 
   await user.save();
 
