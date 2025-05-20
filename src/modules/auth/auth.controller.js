@@ -223,7 +223,7 @@ export const getSingleUser = async(req,res,next) => {
 }
 
 export const addUser = catchError(async(req,res,next) => {
-    const {userName,email,password,phoneNumber,role} = req.body
+    const {userName,email,password,phoneNumber,role,isActive} = req.body
     console.log(req.authUser);
     
     console.log(req.body);
@@ -249,7 +249,8 @@ export const addUser = catchError(async(req,res,next) => {
         email,
         password:hashedPassword,
         phoneNumber,
-        role
+        role,
+        isActive
     })
 
    const userData =  user.save()
