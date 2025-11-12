@@ -30,5 +30,5 @@ userRouter.get('/verify', verifyUserToken)
 // ! Authorized
 userRouter.post('/addUser', isAuth(addUsersEndpoints.ADD_USER) ,multerCloudFunction(allowedExtensions.Image).single('image'), addUser)
 userRouter.put('/update/:id', isAuth(addUsersEndpoints.UPDATE_USER), multerCloudFunction(allowedExtensions.Image).single('image'), UpdateUser)
-userRouter.delete('/:id',isAuth(addUsersEndpoints.DELETE_USER), deleteUser)
+userRouter.delete('/:id', deleteUser)
 export default userRouter

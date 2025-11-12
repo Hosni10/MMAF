@@ -142,74 +142,74 @@ export const logout = async (req, res, next) => {
     }
   };
 
-// export const forgetPassword = async(req,res,next) => {
-//     const {email} = req.body
+export const forgetPassword = async(req,res,next) => {
+    const {email} = req.body
 
-//     const isExist = await userModel.findOne({email})
-//     if(!isExist){
-//         return res.status(400).json({message: "Email not found"})
-//     }
+    const isExist = await userModel.findOne({email})
+    if(!isExist){
+        return res.status(400).json({message: "Email not found"})
+    }
 
-//     const code = nanoid()
-//     const hashcode = pkg.hashSync(code, +process.env.SALT_ROUNDS) // ! process.env.SALT_ROUNDS
-//     const token = generateToken({
-//         payload:{
-//             email,
-//             sendCode:hashcode,
-//         },
-//         signature: process.env.RESET_TOKEN, // ! process.env.RESET_TOKEN
-//         expiresIn: '1h',
-//     })
-//     const resetPasswordLink = `https://roomo.ai/reset-password.html?token=${token}`
-//     console.log(resetPasswordLink);
+    const code = nanoid()
+    const hashcode = pkg.hashSync(code, +process.env.SALT_ROUNDS) // ! process.env.SALT_ROUNDS
+    const token = generateToken({
+        payload:{
+            email,
+            sendCode:hashcode,
+        },
+        signature: process.env.RESET_TOKEN, // ! process.env.RESET_TOKEN
+        expiresIn: '1h',
+    })
+    const resetPasswordLink = `https://roomo.ai/reset-password.html?token=${token}`
+    console.log(resetPasswordLink);
     
-//     const isEmailSent = sendEmailService({
-//         to:email,
-//         subject: "Reset Password",
-//         message: emailTemplate({
-//             link:resetPasswordLink,
-//             linkData:"Click Here Reset Password",
-//             subject: "Reset Password",
-//         }),
-//     })    
-//     if(!isEmailSent){
-//         return res.status(400).json({message:"Email not found"})
-//     }
+    const isEmailSent = sendEmailService({
+        to:email,
+        subject: "Reset Password",
+        message: emailTemplate({
+            link:resetPasswordLink,
+            linkData:"Click Here Reset Password",
+            subject: "Reset Password",
+        }),
+    })    
+    if(!isEmailSent){
+        return res.status(400).json({message:"Email not found"})
+    }
 
-//     const userupdete = await userModel.findOneAndUpdate(
-//         {email},
-//         {forgetCode:hashcode},
-//         {new: true},
-//     )
-//     return res.status(200).json({message:"password changed",userupdete})
-// }
+    const userupdete = await userModel.findOneAndUpdate(
+        {email},
+        {forgetCode:hashcode},
+        {new: true},
+    )
+    return res.status(200).json({message:"password changed",userupdete})
+}
 
-// export const resetPassword = async(req,res,next) => {
-//     const {token} = req.params
-//     const decoded = verifyToken({token, signature: process.env.RESET_TOKEN}) // ! process.env.RESET_TOKEN
-//     const user = await userModel.findOne({
-//         email: decoded?.email,
-//         fotgetCode: decoded?.sentCode
-//     })
+export const resetPassword = async(req,res,next) => {
+    const {token} = req.params
+    const decoded = verifyToken({token, signature: process.env.RESET_TOKEN}) // ! process.env.RESET_TOKEN
+    const user = await userModel.findOne({
+        email: decoded?.email,
+        fotgetCode: decoded?.sentCode
+    })
 
-//     if(!user){
-//         return res.status(400).json({message: "you are alreade reset it , try to login"})
-//     }
+    if(!user){
+        return res.status(400).json({message: "you are alreade reset it , try to login"})
+    }
     
-//     const {newPassword} = req.body
-//     // console.log(newPassword);
+    const {newPassword} = req.body
+    // console.log(newPassword);
     
-//     const hashedPassword = pkg.hashSync(newPassword, +process.env.SALT_ROUNDS)
+    const hashedPassword = pkg.hashSync(newPassword, +process.env.SALT_ROUNDS)
 
-//     user.password = hashedPassword,
-//     user.forgetCode = null
+    user.password = hashedPassword,
+    user.forgetCode = null
 
-//     const updatedUser = await user.save()
+    const updatedUser = await user.save()
 
 
-//     res.status(200).json({message: "Done",updatedUser})
+    res.status(200).json({message: "Done",updatedUser})
 
-// }
+}
 
 export const getAllUser = async(req,res,next) => {
     const users = await userModel.find().select('-password');
@@ -386,56 +386,56 @@ export const getAllLength = async(req,res,next) => {
 
 
 
-export const forgetPassword = async (req, res, next) => {
-    const { email } = req.body;
-    const verificationCode = crypto.randomInt(100000, 999999);
-    // console.log(verificationCode);
+// export const forgetPassword = async (req, res, next) => {
+//     const { email } = req.body;
+//     const verificationCode = crypto.randomInt(100000, 999999);
+//     // console.log(verificationCode);
     
-    // First check if email already exists
-    const existingUser = await userModel.findOne({ email });
-    if (!existingUser) {
-        return next(new Error('Email not registered'));
-    }
-    // console.log(existingUser);
+//     // First check if email already exists
+//     const existingUser = await userModel.findOne({ email });
+//     if (!existingUser) {
+//         return next(new Error('Email not registered'));
+//     }
+//     // console.log(existingUser);
     
-    existingUser.verificationCode = verificationCode;
-    await existingUser.save();
-    // Store verification code in database
-    await tempVerificationModel.create({
-        email,
-        code: verificationCode,
-        // expiresAt: Date.now() + 10 * 60 * 1000 // 10 minutes
-    });
+//     existingUser.verificationCode = verificationCode;
+//     await existingUser.save();
+//     // Store verification code in database
+//     await tempVerificationModel.create({
+//         email,
+//         code: verificationCode,
+//         // expiresAt: Date.now() + 10 * 60 * 1000 // 10 minutes
+//     });
   
-    await sendVerificationEmail(email, verificationCode);
-    res.status(200).json({ message: 'Verification code sent successfully' });
-  };
+//     await sendVerificationEmail(email, verificationCode);
+//     res.status(200).json({ message: 'Verification code sent successfully' });
+//   };
 
 
-  export const resetPassword = async(req,res,next) => {
-    const {verificationCode, newPassword, email} = req.body;
+//   export const resetPassword = async(req,res,next) => {
+//     const {verificationCode, newPassword, email} = req.body;
     
-    const user = await userModel.findOne({email});
-    if(!user) {
-        return res.status(400).json({message: "User not found"});
-    }
+//     const user = await userModel.findOne({email});
+//     if(!user) {
+//         return res.status(400).json({message: "User not found"});
+//     }
   
-    if (!user.verificationCode || user.verificationCode !== parseInt(verificationCode)) {
-        return res.status(400).json({ error: 'Invalid verification code' });
-    }
+//     if (!user.verificationCode || user.verificationCode !== parseInt(verificationCode)) {
+//         return res.status(400).json({ error: 'Invalid verification code' });
+//     }
   
-    // if (user.codeExpiresAt < Date.now()) {
-    //     return res.status(400).json({ error: 'Verification code expired' });
-    // }
+//     // if (user.codeExpiresAt < Date.now()) {
+//     //     return res.status(400).json({ error: 'Verification code expired' });
+//     // }
 
-    const hashedPassword = pkg.hashSync(newPassword, +process.env.SALT_ROUNDS)
-    user.password = hashedPassword;
-    user.verificationCode = null;
-    user.codeExpiresAt = null;
+//     const hashedPassword = pkg.hashSync(newPassword, +process.env.SALT_ROUNDS)
+//     user.password = hashedPassword;
+//     user.verificationCode = null;
+//     user.codeExpiresAt = null;
   
-    const updatedUser = await user.save();
-    res.status(200).json({message: "Password reset successfully", updatedUser});
-  };
+//     const updatedUser = await user.save();
+//     res.status(200).json({message: "Password reset successfully", updatedUser});
+//   };
 
 export const verifyUserToken = async (req, res, next) => {
   try {
