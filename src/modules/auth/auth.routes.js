@@ -21,7 +21,7 @@ userRouter.get('/getAll', getAllUser)
 userRouter.get('/getDashboard', getAllLength)
 
 userRouter.post("/forget-Password", forgetPassword)
-userRouter.post('/reset-password', resetPassword)
+userRouter.post('/reset-password/:token', resetPassword)
 
 userRouter.get('/verify', verifyUserToken)
 
