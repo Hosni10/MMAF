@@ -429,19 +429,21 @@ const code = nanoid();  // e.g. "483920"
 
 export const resetPassword = async(req,res,next) => {
     const {token} = req.params
+    
     const decoded = verifyToken({token, signature: process.env.SIGN_IN_TOKEN_SECRET}) // ! process.env.RESET_TOKEN
     const user = await userModel.findOne({
         email: decoded?.email,
         fotgetCode: decoded?.sentCode
     })
-
     if(!user){
         return res.status(400).json({message: "you are alreade reset it , try to login"})
     }
 
     const {newPassword} = req.body
 
-    user.password = newPassword,
+    const hashedPassword = pkg.hashSync(newPassword, +process.env.SALT_ROUNDS)
+    
+    user.password = hashedPassword,
     user.forgetCode = null
 
     const updatedUser = await user.save()
