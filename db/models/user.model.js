@@ -36,7 +36,7 @@ const userSchema = new Schema({
     isActive: {
         type: Boolean,
         required: true,
-        default: false
+        default: true
     },
     isDeleted: {
         type: Boolean,
@@ -69,3 +69,5 @@ const userSchema = new Schema({
 },{timeseries: true});
 
 export const userModel = model("user", userSchema);
+
+
