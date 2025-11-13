@@ -12,8 +12,9 @@ import imagekit, { destroyImage } from "../../utilities/imagekitConfigration.js"
 import { membersModel } from "../../../db/models/members.model.js"
 import { newsModel } from "../../../db/models/news.model.js"
 import { tempVerificationModel } from "../../../db/models/OTP_CODE.js"
-import { sendVerificationEmail } from "../../../services/sendEmail.js"
-import crypto from 'crypto';
+import { sendEmailService } from "../../../services/sendEmail.js"
+import {emailTemplate} from "../../utilities/emailTemplate.js"
+import { customAlphabet } from 'nanoid';
 
 export const signup = async(req,res,next) => {
     
@@ -386,57 +387,68 @@ export const getAllLength = async(req,res,next) => {
 
 
 
-// export const forgetPassword = async (req, res, next) => {
-//     const { email } = req.body;
-//     const verificationCode = crypto.randomInt(100000, 999999);
-//     // console.log(verificationCode);
+export const forgetPassword = async(req,res,next) => {
+    const {email} = req.body
+
+    const isExist = await userModel.findOne({email})
+    if(!isExist){
+        return res.status(400).json({message: "Email not found"})
+    }
+
+const nanoid = customAlphabet('1234567890', 6);
+const code = nanoid();  // e.g. "483920"
+    const hashcode = pkg.hashSync(code, +process.env.SALT_ROUNDS) // ! process.env.SALT_ROUNDS
+    const token = generateToken({
+        payload:{
+            email,
+            sendCode:hashcode,
+        },
+        signature: process.env.SIGN_IN_TOKEN_SECRET, // ! process.env.RESET_TOKEN
+        expiresIn: '1h',
+    })
+    const resetPasswordLink = `https://sport-dashboard-pi.vercel.app/reset-password/${token}`
+    const isEmailSent = sendEmailService({
+        to:email,
+        subject: "Reset Password",
+        message: emailTemplate({
+            link:resetPasswordLink,
+            linkData:"Click Here Reset Password",
+            subject: "Reset Password",
+        }),
+    })
+    if(!isEmailSent){
+        return res.status(400).json({message:"Email not found"})
+    }
+
+    const userupdete = await userModel.findOneAndUpdate(
+        {email},
+        {new: true},
+    )
+    return res.status(200).json({message:"password changed",userupdete})
+}
+
+export const resetPassword = async(req,res,next) => {
+    const {token} = req.params
     
-//     // First check if email already exists
-//     const existingUser = await userModel.findOne({ email });
-//     if (!existingUser) {
-//         return next(new Error('Email not registered'));
-//     }
-//     // console.log(existingUser);
+    const decoded = verifyToken({token, signature: process.env.SIGN_IN_TOKEN_SECRET}) // ! process.env.RESET_TOKEN
+    const user = await userModel.findOne({
+        email: decoded?.email,
+        fotgetCode: decoded?.sentCode
+    })
+    if(!user){
+        return res.status(400).json({message: "you are alreade reset it , try to login"})
+    }
+
+    const {newPassword} = req.body
+
+    const hashedPassword = pkg.hashSync(newPassword, +process.env.SALT_ROUNDS)
     
-//     existingUser.verificationCode = verificationCode;
-//     await existingUser.save();
-//     // Store verification code in database
-//     await tempVerificationModel.create({
-//         email,
-//         code: verificationCode,
-//         // expiresAt: Date.now() + 10 * 60 * 1000 // 10 minutes
-//     });
-  
-//     await sendVerificationEmail(email, verificationCode);
-//     res.status(200).json({ message: 'Verification code sent successfully' });
-//   };
+    user.password = hashedPassword,
+    user.forgetCode = null
 
-
-//   export const resetPassword = async(req,res,next) => {
-//     const {verificationCode, newPassword, email} = req.body;
-    
-//     const user = await userModel.findOne({email});
-//     if(!user) {
-//         return res.status(400).json({message: "User not found"});
-//     }
-  
-//     if (!user.verificationCode || user.verificationCode !== parseInt(verificationCode)) {
-//         return res.status(400).json({ error: 'Invalid verification code' });
-//     }
-  
-//     // if (user.codeExpiresAt < Date.now()) {
-//     //     return res.status(400).json({ error: 'Verification code expired' });
-//     // }
-
-//     const hashedPassword = pkg.hashSync(newPassword, +process.env.SALT_ROUNDS)
-//     user.password = hashedPassword;
-//     user.verificationCode = null;
-//     user.codeExpiresAt = null;
-  
-//     const updatedUser = await user.save();
-//     res.status(200).json({message: "Password reset successfully", updatedUser});
-//   };
-
+    const updatedUser = await user.save()
+    res.status(200).json({message: "Done",updatedUser})
+}
 export const verifyUserToken = async (req, res, next) => {
   try {
     const { authorization } = req.headers;
