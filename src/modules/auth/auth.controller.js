@@ -143,74 +143,74 @@ export const logout = async (req, res, next) => {
     }
   };
 
-// export const forgetPassword = async(req,res,next) => {
-//     const {email} = req.body
+export const forgetPassword = async(req,res,next) => {
+    const {email} = req.body
 
-//     const isExist = await userModel.findOne({email})
-//     if(!isExist){
-//         return res.status(400).json({message: "Email not found"})
-//     }
+    const isExist = await userModel.findOne({email})
+    if(!isExist){
+        return res.status(400).json({message: "Email not found"})
+    }
 
-//     const code = nanoid()
-//     const hashcode = pkg.hashSync(code, +process.env.SALT_ROUNDS) // ! process.env.SALT_ROUNDS
-//     const token = generateToken({
-//         payload:{
-//             email,
-//             sendCode:hashcode,
-//         },
-//         signature: process.env.RESET_TOKEN, // ! process.env.RESET_TOKEN
-//         expiresIn: '1h',
-//     })
-//     const resetPasswordLink = `https://roomo.ai/reset-password.html?token=${token}`
-//     console.log(resetPasswordLink);
+    const code = nanoid()
+    const hashcode = pkg.hashSync(code, +process.env.SALT_ROUNDS) // ! process.env.SALT_ROUNDS
+    const token = generateToken({
+        payload:{
+            email,
+            sendCode:hashcode,
+        },
+        signature: process.env.RESET_TOKEN, // ! process.env.RESET_TOKEN
+        expiresIn: '1h',
+    })
+    const resetPasswordLink = `https://roomo.ai/reset-password.html?token=${token}`
+    console.log(resetPasswordLink);
     
-//     const isEmailSent = sendEmailService({
-//         to:email,
-//         subject: "Reset Password",
-//         message: emailTemplate({
-//             link:resetPasswordLink,
-//             linkData:"Click Here Reset Password",
-//             subject: "Reset Password",
-//         }),
-//     })    
-//     if(!isEmailSent){
-//         return res.status(400).json({message:"Email not found"})
-//     }
+    const isEmailSent = sendEmailService({
+        to:email,
+        subject: "Reset Password",
+        message: emailTemplate({
+            link:resetPasswordLink,
+            linkData:"Click Here Reset Password",
+            subject: "Reset Password",
+        }),
+    })    
+    if(!isEmailSent){
+        return res.status(400).json({message:"Email not found"})
+    }
 
-//     const userupdete = await userModel.findOneAndUpdate(
-//         {email},
-//         {forgetCode:hashcode},
-//         {new: true},
-//     )
-//     return res.status(200).json({message:"password changed",userupdete})
-// }
+    const userupdete = await userModel.findOneAndUpdate(
+        {email},
+        {forgetCode:hashcode},
+        {new: true},
+    )
+    return res.status(200).json({message:"password changed",userupdete})
+}
 
-// export const resetPassword = async(req,res,next) => {
-//     const {token} = req.params
-//     const decoded = verifyToken({token, signature: process.env.RESET_TOKEN}) // ! process.env.RESET_TOKEN
-//     const user = await userModel.findOne({
-//         email: decoded?.email,
-//         fotgetCode: decoded?.sentCode
-//     })
+export const resetPassword = async(req,res,next) => {
+    const {token} = req.params
+    const decoded = verifyToken({token, signature: process.env.RESET_TOKEN}) // ! process.env.RESET_TOKEN
+    const user = await userModel.findOne({
+        email: decoded?.email,
+        fotgetCode: decoded?.sentCode
+    })
 
-//     if(!user){
-//         return res.status(400).json({message: "you are alreade reset it , try to login"})
-//     }
+    if(!user){
+        return res.status(400).json({message: "you are alreade reset it , try to login"})
+    }
     
-//     const {newPassword} = req.body
-//     // console.log(newPassword);
+    const {newPassword} = req.body
+    // console.log(newPassword);
     
-//     const hashedPassword = pkg.hashSync(newPassword, +process.env.SALT_ROUNDS)
+    const hashedPassword = pkg.hashSync(newPassword, +process.env.SALT_ROUNDS)
 
-//     user.password = hashedPassword,
-//     user.forgetCode = null
+    user.password = hashedPassword,
+    user.forgetCode = null
 
-//     const updatedUser = await user.save()
+    const updatedUser = await user.save()
 
 
-//     res.status(200).json({message: "Done",updatedUser})
+    res.status(200).json({message: "Done",updatedUser})
 
-// }
+}
 
 export const getAllUser = async(req,res,next) => {
     const users = await userModel.find().select('-password');
